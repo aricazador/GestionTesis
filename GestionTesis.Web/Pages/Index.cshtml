@@ -1,0 +1,37 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Inicio";
+}
+@if (Model.Denegado)
+{
+    <div class="alert alert-warning"><i class="bi bi-shield-lock"></i> Acceso denegado: solo el <b>Administrador</b> puede hacer eso. Tu rol solo permite ver.</div>
+}
+
+<div class="p-4 mb-4 rounded-4 bg-magenta-claro">
+    <h2 class="text-magenta fw-bold mb-1"><i class="bi bi-mortarboard"></i> Sistema de Gestión de Tesis</h2>
+    <p class="mb-0">Hola <b>@Model.Usuario</b>, tu rol es <b>@Model.Rol</b>.
+        @(Model.EsAdmin ? "Podés crear, editar y eliminar tutores, tesis y usuarios." : "Podés consultar tutores y tesis.")</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card shadow-sm tarjeta-stat"><div class="card-body">
+        <div class="text-muted small">Tutores</div><div class="fs-2 fw-bold text-magenta">@Model.Tutores.Count</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm tarjeta-stat"><div class="card-body">
+        <div class="text-muted small">Tesis</div><div class="fs-2 fw-bold text-magenta">@Model.Tesis.Count</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm tarjeta-stat"><div class="card-body">
+        <div class="text-muted small">Tesis aprobadas</div><div class="fs-2 fw-bold text-magenta">@Model.Tesis.Count(t => t.Estado == EstadosTesis.Aprobada)</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm tarjeta-stat"><div class="card-body">
+        <div class="text-muted small">Tutores con cupo lleno (@Reglas.MaximoTesisPorTutor/@Reglas.MaximoTesisPorTutor)</div>
+        <div class="fs-2 fw-bold text-magenta">@Model.Tutores.Count(t => t.CantidadTesis >= Reglas.MaximoTesisPorTutor)</div></div></div></div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="text-magenta"><i class="bi bi-search"></i> Buscar tesis</h5>
+        <form method="get" asp-page="/Tesis/Index" class="d-flex gap-2">
+            <input name="Texto" class="form-control" placeholder="Título, estudiante, estado o tutor..." />
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Buscar</button>
+        </form>
+    </div>
+</div>

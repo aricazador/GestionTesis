@@ -1,0 +1,13 @@
+# Visual Studio / .NET
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.log
+TestResults/
+
+# Imágenes subidas por los usuarios (las de muestra sí se versionan)
+GestionTesis.Api/wwwroot/imagenes/*
+!GestionTesis.Api/wwwroot/imagenes/muestras/

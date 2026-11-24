@@ -1,0 +1,207 @@
+@page
+@model GestionTesis.Web.Pages.Tesis.IndexModel
+@{
+    ViewData["Title"] = "Tesis";
+    // Lista de tutores para el <select>, mostrando cuántas tesis tiene cada uno (máx. 3)
+    var opcionesTutor = Model.Tutores.Select(t => new SelectListItem(
+        $"{t.Nombre} — {t.Especialidad} ({t.CantidadTesis}/{Reglas.MaximoTesisPorTutor})", t.Id.ToString())).ToList();
+    var opcionesEstado = EstadosTesis.Todos.Select(e => new SelectListItem(e, e)).ToList();
+    string ColorEstado(string e) => e switch
+    {
+        EstadosTesis.Aprobada => "bg-success",
+        EstadosTesis.Rechazada => "bg-danger",
+        EstadosTesis.EnDesarrollo => "bg-warning text-dark",
+        _ => "bg-secondary"
+    };
+}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h3 class="text-magenta mb-0"><i class="bi bi-journal-bookmark"></i> Tesis</h3>
+    @if (Model.EsAdmin)
+    {
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear" data-nuevo="#formCrear">
+            <i class="bi bi-plus-circle"></i> Nueva tesis
+        </button>
+    }
+</div>
+
+<!-- BUSCADOR (punto 3: buscar tesis y mostrar tutor) -->
+<form method="get" class="card shadow-sm mb-3">
+    <div class="card-body d-flex gap-2 flex-wrap">
+        <input asp-for="Texto" class="form-control flex-grow-1" style="max-width: 520px"
+               placeholder="Buscar por título, estudiante, estado o tutor..." />
+        <button class="btn btn-primary"><i class="bi bi-search"></i> Buscar</button>
+        @if (!string.IsNullOrWhiteSpace(Model.Texto))
+        {
+            <a asp-page="./Index" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> Limpiar</a>
+            <span class="align-self-center text-muted small">@Model.Lista.Count resultado(s) para «@Model.Texto»</span>
+        }
+    </div>
+</form>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-magenta align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Portada</th>
+                    <th>Título</th>
+                    <th>Estudiante</th>
+                    <th>Estado</th>
+                    <th>Tutor</th>
+                    @if (Model.EsAdmin) { <th class="text-end">Acciones</th> }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Lista.Count == 0)
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">No se encontraron tesis.</td></tr>
+                }
+                @foreach (var t in Model.Lista)
+                {
+                    var valores = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, string>
+                    {
+                        ["EdicionId"] = t.Id.ToString(),
+                        ["Edicion.Titulo"] = t.Titulo,
+                        ["Edicion.Estudiante"] = t.Estudiante,
+                        ["Edicion.Estado"] = t.Estado,
+                        ["Edicion.TutorId"] = t.TutorId.ToString()
+                    });
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(t.ImagenRuta))
+                            {
+                                <a href="@Model.UrlImagen(t.ImagenRuta)" class="glightbox" data-gallery="tesis"
+                                   data-title="@t.Titulo" data-description="@t.Estudiante · Tutor: @t.TutorNombre">
+                                    <img src="@Model.UrlImagen(t.ImagenRuta)" class="miniatura" alt="Portada" />
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="sin-imagen" title="Sin imagen"><i class="bi bi-image"></i></div>
+                            }
+                        </td>
+                        <td class="fw-semibold">@t.Titulo</td>
+                        <td>@t.Estudiante</td>
+                        <td><span class="badge @ColorEstado(t.Estado)">@t.Estado</span></td>
+                        <td>
+                            <div class="fw-semibold">@t.TutorNombre</div>
+                            <div class="small text-muted">@t.TutorEspecialidad</div>
+                            <div class="small"><a href="mailto:@t.TutorCorreo">@t.TutorCorreo</a></div>
+                        </td>
+                        @if (Model.EsAdmin)
+                        {
+                            <td class="text-end text-nowrap">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditar"
+                                        data-editar="#formEditar" data-valores="@valores" title="Editar / cambiar imagen">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <form method="post" asp-page-handler="Eliminar" asp-route-id="@t.Id" class="d-inline"
+                                      data-confirmar="¿Eliminar la tesis «@t.Titulo»?">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (Model.EsAdmin)
+{
+    <!-- MODAL CREAR -->
+    <div class="modal fade" id="modalCrear" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form method="post" asp-page-handler="Crear" enctype="multipart/form-data" id="formCrear" class="modal-content">
+                <div class="modal-header"><h5 class="modal-title"><i class="bi bi-plus-circle"></i> Nueva tesis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                    <div class="mb-3">
+                        <label asp-for="Nuevo.Titulo" class="form-label">Título</label>
+                        <input asp-for="Nuevo.Titulo" class="form-control" />
+                        <span asp-validation-for="Nuevo.Titulo"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            <label asp-for="Nuevo.Estudiante" class="form-label">Estudiante</label>
+                            <input asp-for="Nuevo.Estudiante" class="form-control" />
+                            <span asp-validation-for="Nuevo.Estudiante"></span>
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label asp-for="Nuevo.Estado" class="form-label">Estado</label>
+                            <select asp-for="Nuevo.Estado" asp-items="opcionesEstado" class="form-select"></select>
+                            <span asp-validation-for="Nuevo.Estado"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Nuevo.TutorId" class="form-label">Tutor <small class="text-muted">(máximo @Reglas.MaximoTesisPorTutor tesis por tutor)</small></label>
+                        <select asp-for="Nuevo.TutorId" asp-items="opcionesTutor" class="form-select">
+                            <option value="">-- Elegí un tutor --</option>
+                        </select>
+                        <span asp-validation-for="Nuevo.TutorId"></span>
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="ImagenCrear" class="form-label">Imagen de portada <small class="text-muted">(opcional · jpg, png, webp, gif · máx. 2 MB)</small></label>
+                        <input asp-for="ImagenCrear" type="file" accept="image/*" class="form-control" />
+                        <span asp-validation-for="ImagenCrear"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR -->
+    <div class="modal fade" id="modalEditar" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form method="post" asp-page-handler="Editar" enctype="multipart/form-data" id="formEditar" class="modal-content">
+                <div class="modal-header"><h5 class="modal-title"><i class="bi bi-pencil"></i> Editar tesis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="EdicionId" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                    <div class="mb-3">
+                        <label asp-for="Edicion.Titulo" class="form-label">Título</label>
+                        <input asp-for="Edicion.Titulo" class="form-control" />
+                        <span asp-validation-for="Edicion.Titulo"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            <label asp-for="Edicion.Estudiante" class="form-label">Estudiante</label>
+                            <input asp-for="Edicion.Estudiante" class="form-control" />
+                            <span asp-validation-for="Edicion.Estudiante"></span>
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label asp-for="Edicion.Estado" class="form-label">Estado</label>
+                            <select asp-for="Edicion.Estado" asp-items="opcionesEstado" class="form-select"></select>
+                            <span asp-validation-for="Edicion.Estado"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Edicion.TutorId" class="form-label">Tutor</label>
+                        <select asp-for="Edicion.TutorId" asp-items="opcionesTutor" class="form-select">
+                            <option value="">-- Elegí un tutor --</option>
+                        </select>
+                        <span asp-validation-for="Edicion.TutorId"></span>
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="ImagenEditar" class="form-label">Cambiar imagen <small class="text-muted">(dejalo vacío para conservar la actual)</small></label>
+                        <input asp-for="ImagenEditar" type="file" accept="image/*" class="form-control" />
+                        <span asp-validation-for="ImagenEditar"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

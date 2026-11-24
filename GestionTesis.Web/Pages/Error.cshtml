@@ -1,0 +1,13 @@
+@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Error";
+}
+<div class="card shadow mx-auto mt-4" style="max-width: 640px;">
+    <div class="card-body p-4 text-center">
+        <i class="bi bi-plug text-magenta" style="font-size:3rem"></i>
+        <h4 class="mt-2">Algo salió mal</h4>
+        <p class="text-muted">@Model.Mensaje</p>
+        <a href="/" class="btn btn-primary">Volver al inicio</a>
+    </div>
+</div>

@@ -1,0 +1,65 @@
+@page
+@model GestionTesis.Web.Pages.Usuarios.IndexModel
+@{
+    ViewData["Title"] = "Usuarios";
+    var roles = new List<SelectListItem> { new(Roles.Usuario, Roles.Usuario), new(Roles.Administrador, Roles.Administrador) };
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="text-magenta mb-0"><i class="bi bi-people"></i> Usuarios</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear" data-nuevo="#formCrear">
+        <i class="bi bi-person-plus"></i> Nuevo usuario
+    </button>
+</div>
+
+<div class="card shadow-sm">
+    <table class="table table-hover table-magenta align-middle mb-0">
+        <thead><tr><th>Usuario</th><th>Rol</th></tr></thead>
+        <tbody>
+            @foreach (var u in Model.Lista)
+            {
+                <tr>
+                    <td><i class="bi bi-person-circle text-magenta"></i> @u.NombreUsuario</td>
+                    <td><span class="badge @(u.Rol == Roles.Administrador ? "bg-magenta" : "bg-secondary")">@u.Rol</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="modalCrear" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="post" asp-page-handler="Crear" id="formCrear" class="modal-content">
+            <div class="modal-header"><h5 class="modal-title"><i class="bi bi-person-plus"></i> Nuevo usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                <div class="mb-3">
+                    <label asp-for="Nuevo.NombreUsuario" class="form-label">Usuario</label>
+                    <input asp-for="Nuevo.NombreUsuario" class="form-control" />
+                    <span asp-validation-for="Nuevo.NombreUsuario"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Nuevo.Password" class="form-label">Contraseña</label>
+                    <input asp-for="Nuevo.Password" class="form-control" />
+                    <span asp-validation-for="Nuevo.Password"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Nuevo.ConfirmarPassword" class="form-label">Confirmar contraseña</label>
+                    <input asp-for="Nuevo.ConfirmarPassword" class="form-control" />
+                    <span asp-validation-for="Nuevo.ConfirmarPassword"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Nuevo.Rol" class="form-label">Rol</label>
+                    <select asp-for="Nuevo.Rol" asp-items="roles" class="form-select"></select>
+                    <span asp-validation-for="Nuevo.Rol"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Crear</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

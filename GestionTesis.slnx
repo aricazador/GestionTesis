@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="GestionTesis.Api/GestionTesis.Api.csproj" />
+  <Project Path="GestionTesis.Contratos/GestionTesis.Contratos.csproj" />
+  <Project Path="GestionTesis.Web/GestionTesis.Web.csproj" />
+</Solution>

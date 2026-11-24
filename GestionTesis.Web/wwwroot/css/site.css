@@ -1,0 +1,67 @@
+/* ===== Tema MAGENTA (punto 5 de la consigna) ===== */
+:root {
+    --magenta: #c2007a;
+    --magenta-oscuro: #8e0059;
+    --magenta-claro: #fde6f3;
+    --bs-primary: #c2007a;
+    --bs-primary-rgb: 194, 0, 122;
+    --bs-link-color: #c2007a;
+    --bs-link-color-rgb: 194, 0, 122;
+    --bs-link-hover-color: #8e0059;
+    --bs-link-hover-color-rgb: 142, 0, 89;
+}
+
+body { background-color: #fff7fb; }
+
+.navbar-magenta { background: linear-gradient(90deg, var(--magenta-oscuro), var(--magenta)); }
+.navbar-magenta .nav-link.active { font-weight: 600; border-bottom: 2px solid #fff; }
+.footer-magenta { background: var(--magenta-oscuro); color: #ffd6ec; }
+
+.btn-primary {
+    --bs-btn-bg: var(--magenta);
+    --bs-btn-border-color: var(--magenta);
+    --bs-btn-hover-bg: var(--magenta-oscuro);
+    --bs-btn-hover-border-color: var(--magenta-oscuro);
+    --bs-btn-active-bg: var(--magenta-oscuro);
+    --bs-btn-active-border-color: var(--magenta-oscuro);
+    --bs-btn-disabled-bg: var(--magenta);
+    --bs-btn-disabled-border-color: var(--magenta);
+}
+.btn-outline-primary {
+    --bs-btn-color: var(--magenta);
+    --bs-btn-border-color: var(--magenta);
+    --bs-btn-hover-bg: var(--magenta);
+    --bs-btn-hover-border-color: var(--magenta);
+    --bs-btn-active-bg: var(--magenta-oscuro);
+    --bs-btn-active-border-color: var(--magenta-oscuro);
+}
+.text-magenta { color: var(--magenta) !important; }
+.bg-magenta { background-color: var(--magenta) !important; color: #fff; }
+.bg-magenta-claro { background-color: var(--magenta-claro) !important; }
+
+.card { border: none; border-radius: 1rem; }
+.card-header-magenta { background: var(--magenta); color: #fff; border-radius: 1rem 1rem 0 0 !important; }
+
+.table-magenta thead th { background-color: var(--magenta); color: #fff; border-color: var(--magenta-oscuro); }
+.table-hover tbody tr:hover > * { background-color: var(--magenta-claro); }
+
+.modal-header { background: var(--magenta); color: #fff; }
+.modal-header .btn-close { filter: invert(1); }
+
+.form-control:focus, .form-select:focus {
+    border-color: #e05fb0;
+    box-shadow: 0 0 0 .25rem rgba(194, 0, 122, .2);
+}
+
+/* Errores debajo de cada campo */
+.input-validation-error { border-color: #dc3545 !important; }
+.field-validation-error { color: #dc3545; font-size: .85rem; display: block; margin-top: .25rem; }
+.validation-summary-errors ul { margin-bottom: 0; padding-left: 1rem; }
+
+/* Miniaturas + GLightbox */
+.miniatura { width: 56px; height: 72px; object-fit: cover; border-radius: .4rem; border: 2px solid var(--magenta-claro); transition: transform .15s; }
+.miniatura:hover { transform: scale(1.08); border-color: var(--magenta); }
+.sin-imagen { width: 56px; height: 72px; border-radius: .4rem; background: var(--magenta-claro); color: var(--magenta); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+
+.tarjeta-stat { border-left: 6px solid var(--magenta) !important; }
+.login-card { max-width: 440px; }
